@@ -24,7 +24,9 @@ class Var:
 
     @overload
     def __init__(self, _story: Expr, exp: int = 0):
-        """Never use Var(...) in this way. This is used only by library"""
+        """
+        Never use Var(...) in this way. This is used only by library
+        """
         ...
 
     @overload
@@ -99,9 +101,9 @@ class Var:
     def __str__(self) -> str:
         """
         :return: string looking like "value \\pm error", where value end error are rounded.
-        Digits that have the same order as the 40% error will not be shown.
+        Digits that have the same order as the 30% error will not be shown.
         If error is zero, there won't be shown digits having the same order as 5% value.
-        (40% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
+        (30% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
         """
         return normalize(self)
 
@@ -300,31 +302,39 @@ class GroupVar:
 
 TypicalArgument = Union[SupportsFloat, Var, GroupVar]
 
-error_accuracy: float = 0.4
+error_accuracy: float = 0.3
 value_accuracy: float = 0.05
 
 
 def set_error_accuracy(accuracy: float):
-    """Look in Var.__str__ documentation"""
+    """
+    Look in Var.__str__ documentation
+    """
     global error_accuracy
     error_accuracy = accuracy
 
 
 def set_value_accuracy(accuracy: float):
-    """Look in Var.__str__ documentation"""
+    """
+    Look in Var.__str__ documentation
+    """
     global value_accuracy
     value_accuracy = accuracy
 
 
 def suitable_accuracy(val: float, err: float) -> int:
-    """Finds needed number of digits as it was shown Var.__str__ documentation"""
+    """
+    Finds needed number of digits as it was shown Var.__str__ documentation
+    """
     if err == 0:
         return Decimal.from_float(val * value_accuracy).adjusted()
     return Decimal.from_float(err * error_accuracy).adjusted()
 
 
 def normalize(var: Var, accuracy: Optional[int] = None) -> str:
-    """The same as str(var), but you can set the number of shown digits in parameter 'accuracy'"""
+    """
+    The same as str(var), but you can set the number of shown digits in parameter 'accuracy'
+    """
     val, err = var.val_err()
     if accuracy is None:
         accuracy = suitable_accuracy(val, err)
@@ -336,14 +346,22 @@ BIG_NUMBER = 50
 
 
 def set_big_number(n: int):
-    """look in Var.err documentation"""
+    """
+    look in Var.err documentation
+    """
     global BIG_NUMBER
     BIG_NUMBER = n
 
 
 def estimated_error(func: Callable[[...], float], values: array, err_vector: array, val: float):
+    """
+    We catch warnings turning them to errors. If errors is too big, method returns RunTimeWarning exception.
+    :param func: some function that is applied to values
+    :param values: some values
+    :param err_vector: errors that are checked for the size
+    :param val: a value
+    """
     err_vector /= BIG_NUMBER
-    # we catch warnings turning them to errors
     with catch_warnings():
         simplefilter("error")
         try:

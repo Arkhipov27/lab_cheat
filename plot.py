@@ -75,17 +75,17 @@ class Figure:
                    N: int = 1000, line_style: Optional[str] = None, colour: Optional[str] = None,
                    label: Optional[str] = None, add_before_fixing_axes: bool = True) -> Figure:
         """
-        todo: doc and ;сделать возможность проводить линию до края графика по оси xt влево или вправо, если указано None;
-        :param func:
-        :param x_min:
-        :param x_max:
-        :param N:
-        :param line_style:
-        :param colour:
-        :param label:
-        :param add_before_fixing_axes:
-        :return:
+        :param func: the function we want to graph
+        :param x_min: the minimum of x
+        :param x_max: the maximum of x
+        :param N: amount of dots on the graph
+        :param line_style: style of line
+        :param colour: colour of line
+        :param label: display in the legend
+        :param add_before_fixing_axes: a value
+        :return: figure
         """
+        # todo: doc and ;сделать возможность проводить линию до края графика по оси xt влево или вправо, если указано None;
         if isinstance(x_min, Var):
             x_min = x_min.val()
         if isinstance(x_max, Var):
@@ -93,7 +93,7 @@ class Figure:
         x = linspace(x_min, x_max, N)
         y = func(x)
         ({False: self._func_graphs_before_fixing_axes, True: self._func_graphs_after_fixing_axes}
-        )[add_before_fixing_axes].append((x, y, line_style, colour, label))
+         )[add_before_fixing_axes].append((x, y, line_style, colour, label))
         return self
 
     def plot(self, x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence],
@@ -256,7 +256,8 @@ def mnk(x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence], figure: Opti
 def mnk_through0(x: GroupVar, y: GroupVar, figure: Optional[Figure] = None, colour: Optional[str] = None,
                  line_style: Optional[str] = None, label: Optional[str] = None) -> Var:
     # todo: добавить статистическую ошибку
-    if len(x) != len(y): raise TypeError('"x" and "y" must be the same length')
+    if len(x) != len(y):
+        raise TypeError('"x" and "y" must be the same length')
     k: Var = reduce(lambda res, i: res + x[i] * y[i], range(len(x)), 0) / \
              reduce(lambda res, x_var: res + x_var * x_var, x[1:], x[0] * x[0])
     if figure is not None:

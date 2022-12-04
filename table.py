@@ -38,7 +38,7 @@ class TexTable:
             self._titles.append('\\Delta ' + title)
         return self
 
-    def show(self, caption: Optional[str] = None, numerate: bool = True, colours=('C0C0C0', 'EFEFEF', 'C0C0C0'),
+    def show(self, numerate: bool = True, colours=('C0C0C0', 'EFEFEF', 'C0C0C0'),
              color_frequency: int = 2):
         if numerate is True:
             self._numerating()
@@ -46,7 +46,7 @@ class TexTable:
                              self._write_numbers(numerate, colours, color_frequency) + self._end())
 
     def _numerating(self):
-        self._titles = [''] + self._titles
+        self._titles = [' '] + self._titles
         max_num = max(map(len, self._numbers))
         self._numbers = [tuple(str(i) for i in range(1, max_num+1))] + self._numbers
 
@@ -82,6 +82,7 @@ class TexTable:
         text_tk.insert(float(0), text)
         text_tk.pack(expand=tk.YES, fill=tk.BOTH)
         # ctrl+A does not mean selecting all automatically, that's why i make it by myself
+
         def select_all(event):
             event.widget.tag_add(tk.SEL, '1.0', tk.END)
             return 'break'
