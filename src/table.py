@@ -1,6 +1,6 @@
 import tkinter as tk
 from string import printable as english_symbols
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
 from .var import GroupVar, suitable_accuracy
 

@@ -7,7 +7,6 @@ from warnings import catch_warnings, simplefilter
 
 from numpy import sqrt, array, diag, isnan
 from sympy.core.symbol import Symbol, Expr
-import sympy
 from sympy.utilities import lambdify
 
 DictSymVar: Dict[Symbol, Var] = {}
