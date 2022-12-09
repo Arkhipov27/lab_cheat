@@ -10,8 +10,8 @@ from scipy.optimize import fmin as _fmin
 from scipy.optimize import curve_fit as _curve_fit
 
 from lab_cheat import *
-from .table import rus_tex_formula
-from .var import set_value_accuracy, set_error_accuracy, set_big_number, normalize, GroupVar
+from lab_cheat.table import rus_tex_formula
+from lab_cheat.var import set_value_accuracy, set_error_accuracy, set_big_number, normalize, GroupVar
 
 _rare_used_funcs = [set_value_accuracy, set_error_accuracy, set_big_number, rus_tex_formula, normalize]
 
