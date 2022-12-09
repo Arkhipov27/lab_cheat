@@ -38,36 +38,22 @@ class TexTable:
             self._titles.append('\\Delta ' + title)
         return self
 
-    def show(self, numerate: bool = True, table: bool = False, floatrow: bool = False, colours=('C0C0C0', 'EFEFEF', 'C0C0C0'),
+    def show(self, numerate: bool = True, colours=('C0C0C0', 'EFEFEF', 'C0C0C0'),
              color_frequency: int = 2):
         if numerate is True:
             self._numerating()
-        if not table:
-            self._show_tk_window(self._begin_center() + self._write_titles(colours) +
-                                 self._write_numbers(numerate, colours, color_frequency) + self._end_center())
-        else:
-            self._show_tk_window(self._begin_table(floatrow) + self._write_titles(colours) +
-                                 self._write_numbers(numerate, colours, color_frequency) + self._end_table(floatrow))
+        self._show_tk_window(self._begin() + self._write_titles(colours) +
+                             self._write_numbers(numerate, colours, color_frequency) + self._end())
 
     def _numerating(self):
         self._titles = [' '] + self._titles
         max_num = max(map(len, self._numbers))
-        self._numbers = [tuple(str(i) for i in range(1, max_num + 1))] + self._numbers
+        self._numbers = [tuple(str(i) for i in range(1, max_num+1))] + self._numbers
 
-    def _begin_center(self):
+    def _begin(self):
         return "\\begin{center} \n" + \
                "\\textbf{Таблица @} \\\\ \n" + \
-               "\\begin{tabular}{|" + "".join(['c|'] * len(self._titles)) + "}\n"
-
-    def _begin_table(self, floatrow: bool = False):
-        if not floatrow:
-            return "\\begin{table}[h] \n" + \
-                   "\\caption{Таблица @} \\\\ \n" + \
-                   "\\begin{tabular}{|" + "".join(['c|'] * len(self._titles)) + "}\n"
-        return "\\begin{table}[h]\\TopFloatBoxes \n" + \
-               "\\caption{Таблица @} \\\\ \n" + \
-               "\\begin{floatrow} \n" + \
-               "\\begin{tabular}{|" + "".join(['c|'] * len(self._titles)) + "}\n"
+               "\\begin{tabular}{|"+"".join(['c|'] * len(self._titles)) + "}\n"
 
     def _write_titles(self, colours):
         return "\\hline\n" + \
@@ -85,18 +71,9 @@ class TexTable:
         return result
 
     @staticmethod
-    def _end_center():
+    def _end():
         return "\\end{tabular}\n" + \
                "\end{center}\n"
-
-    @staticmethod
-    def _end_table(floatrow: bool = False):
-        if not floatrow:
-            return "\\end{tabular}\n" + \
-                   "\end{table}\n"
-        return "\\end{tabular}\n" + \
-               "\\end{floatrow}\n" + \
-               "\end{table}\n"
 
     @staticmethod
     def _show_tk_window(text):
@@ -104,13 +81,11 @@ class TexTable:
         text_tk = tk.Text(width=100, height=30, wrap=tk.WORD)
         text_tk.insert(float(0), text)
         text_tk.pack(expand=tk.YES, fill=tk.BOTH)
-
         # ctrl+A does not mean selecting all automatically, that's why i make it by myself
 
         def select_all(event):
             event.widget.tag_add(tk.SEL, '1.0', tk.END)
             return 'break'
-
         text_tk.bind('<Control-a>', select_all)
         root.mainloop()
 

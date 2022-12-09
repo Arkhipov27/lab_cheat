@@ -7,7 +7,6 @@ from warnings import catch_warnings, simplefilter
 
 from numpy import sqrt, array, diag, isnan
 from sympy.core.symbol import Symbol, Expr
-import sympy
 from sympy.utilities import lambdify
 
 DictSymVar: Dict[Symbol, Var] = {}
@@ -102,9 +101,9 @@ class Var:
     def __str__(self) -> str:
         """
         :return: string looking like "value \\pm error", where value end error are rounded.
-        Digits that have the same order as the 40% error will not be shown.
+        Digits that have the same order as the 30% error will not be shown.
         If error is zero, there won't be shown digits having the same order as 5% value.
-        (40% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
+        (30% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
         """
         return normalize(self)
 
@@ -303,7 +302,7 @@ class GroupVar:
 
 TypicalArgument = Union[SupportsFloat, Var, GroupVar]
 
-error_accuracy: float = 0.4
+error_accuracy: float = 0.3
 value_accuracy: float = 0.05
 
 
@@ -356,11 +355,10 @@ def set_big_number(n: int):
 
 def estimated_error(func: Callable[[...], float], values: array, err_vector: array, val: float):
     """
-    This method lets to calculate errors approximately.
     We catch warnings turning them to errors. If errors is too big, method returns RunTimeWarning exception.
     :param func: some function that is applied to values
     :param values: some values
-    :param err_vector: errors of the values
+    :param err_vector: errors that are checked for the size
     :param val: a value
     """
     err_vector /= BIG_NUMBER
@@ -378,4 +376,3 @@ def estimated_error(func: Callable[[...], float], values: array, err_vector: arr
         except RuntimeWarning:
             return (val - v_plus) * BIG_NUMBER
         return (v_plus - v_minus) / 2 * BIG_NUMBER
-

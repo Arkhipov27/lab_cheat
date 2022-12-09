@@ -226,19 +226,10 @@ class Figure:
 def mnk(x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence], figure: Optional[Figure] = None,
         colour: Optional[str] = None,
         line_style: Optional[str] = None, label: Optional[str] = None) -> Tuple[Var, Var]:
-    """
-    This method calculates two types of errors - called by exact error and statistics.
-    If points put on the straight well, statistic error will prevail.
-    If points are measured extremely precisely, but they put on the straight badly, statistic error will prevail.
-    Result error will be square root from the sum of squares of these errors.
-    :param x: array on x-axis
-    :param y: array on y-axis
-    :param figure: figure
-    :param colour: colour of the line
-    :param line_style: style of the line
-    :param label: name in the legend
-    :return: coefficients of the straight
-    """
+    # Данный метод считает два вида ошибок: вызываемый погрешностями и вызываемый статистикой.
+    # Если точки хорошо ложатся на прямую, то преобладать будет ошибка из-за погрешностей.
+    # Если точки измерены крайне точно, но на прямую они ложатся так себе, то преобладает статистическая ошибка.
+    # Рещультирующей ошибкой выдаётся корень из суммы квадратов двух видов этих ошибок
     # TODO: учитывать точки с весом обратным квадрату ошибки
     if len(x) != len(y): raise TypeError('"x" and "y" must be the same length')
     if len(x) == 0: raise ValueError('What should I do with no dots? Genius blyat!')
@@ -264,16 +255,6 @@ def mnk(x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence], figure: Opti
 
 def mnk_through0(x: GroupVar, y: GroupVar, figure: Optional[Figure] = None, colour: Optional[str] = None,
                  line_style: Optional[str] = None, label: Optional[str] = None) -> Var:
-    """
-    Draws the straight through the point (0, 0)
-    :param x: array on x-axis
-    :param y: array on y-axis
-    :param figure: figure
-    :param colour: colour of the line
-    :param line_style: style of the line
-    :param label: name in the legend
-    :return: coefficient of the straight
-    """
     # todo: добавить статистическую ошибку
     if len(x) != len(y):
         raise TypeError('"x" and "y" must be the same length')
