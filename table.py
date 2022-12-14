@@ -1,11 +1,17 @@
 import tkinter as tk
 from string import printable as english_symbols
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
-from .var import GroupVar, suitable_accuracy
+from .var import GroupVar, digital_accuracy
 
 
 def rus_tex_formula(formula: str) -> str:
+    """
+    This method turns tex-formula into russian language
+
+    :param formula: tex-formula
+    :return: russian interpretation
+    """
     ret, rus_now = '', False
     for char in formula:
         if rus_now is (char in english_symbols):
@@ -29,7 +35,7 @@ class TexTable:
 
     def add(self, group_var: GroupVar, title: str, show_err=False):
         values, errors = group_var.val_err()
-        accuracy = round(sum(suitable_accuracy(values[i], errors[i]) for i in range(len(group_var))) / len(group_var))
+        accuracy = round(sum(digital_accuracy(values[i], errors[i]) for i in range(len(group_var))) / len(group_var))
         needed_type = {True: float, False: int}[accuracy < 0]
         self._numbers.append(tuple(map(lambda val: str(needed_type(round(val, -accuracy))), values)))
         self._titles.append(title)

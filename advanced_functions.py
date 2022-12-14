@@ -11,9 +11,9 @@ from scipy.optimize import curve_fit as _curve_fit
 
 from lab_cheat import *
 from .table import rus_tex_formula
-from .var import set_value_accuracy, set_error_accuracy, set_big_number, normalize, GroupVar
+from .var import set_value_accuracy, set_error_accuracy, set_big_number, digital_normalize, GroupVar
 
-_rare_used_funcs = [set_value_accuracy, set_error_accuracy, set_big_number, rus_tex_formula, normalize]
+_rare_used_funcs = [set_value_accuracy, set_error_accuracy, set_big_number, rus_tex_formula, digital_normalize]
 
 
 def slicer(var: GroupVar, left_val: Optional[SupportsFloat] = None,
@@ -22,10 +22,12 @@ def slicer(var: GroupVar, left_val: Optional[SupportsFloat] = None,
     """
     Makes list of indexes of variables which value is between given borders except the nearest vars to numbers in
     exluding list
+
     :param var: GroupVar that contains variables
     :param left_val: left border. If None then -infinity.
     :param right_val: right border. If None then +infinity.
     :param excluding: If None then []
+
     Ex:
     >>> v = GroupVar(range(10), 0)
     >>> s = slicer(v, left_val=1.1, right_val=8, excluding=[3.1, 6.3, 0])
@@ -85,6 +87,7 @@ def sorting(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar]) ->
     """
     !!! x and y must be the same type !!!
     Sorts pairs of data to make xt raising
+
     :return: the same types as x and y.
     """
     if isinstance(x, list) and isinstance(y, list):
@@ -122,9 +125,12 @@ def fmin(f: Callable, x0: Union[Var, SupportsFloat], x: Optional[GroupVar] = Non
         -> Union[Var, SupportsFloat]:
     """
     fmin is for very accurate search of minimum of known graph
+
     :param f: function to minimize
     :param x0: dot near minimum
-    :params x and y to find the error accurately
+    :param x: to find the error accurately
+    :param y: to find the error accurately
+
     :return: x_min
     """
     # TODO: сделать так, чтоб искало минимум на заднанном промежутке. (Потому что, при данной реализации минимум

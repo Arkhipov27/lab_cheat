@@ -83,6 +83,7 @@ class Figure:
         :param colour: colour of line
         :param label: display in the legend
         :param add_before_fixing_axes: a value
+
         :return: figure
         """
         # todo: doc and ;сделать возможность проводить линию до края графика по оси xt влево или вправо, если указано None;
@@ -116,6 +117,7 @@ class Figure:
     def show(self):
         """
         Generates matplotlib.Figure and shows it.
+
         :return: None
         """
         axes = plt.figure().add_subplot()
@@ -161,7 +163,7 @@ class Figure:
         axes.set_ylim(y_min, y_max)
         return x_min, x_max, y_min, y_max
 
-    def _v_lines(self, axes, x_min, x_max, y_min, y_max):
+    def _v_lines(self, axes, y_min, y_max):
         for x, colour, line_style, label in self._v_lines_params:
             if isinstance(x, Var):
                 x_val, x_err = x.val_err()
@@ -173,7 +175,7 @@ class Figure:
             else:
                 axes.plot((x, x), (y_min, y_max), color=colour, linestyle=line_style, label=label)
 
-    def _h_lines(self, axes, x_min, x_max, y_min, y_max):
+    def _h_lines(self, axes, x_min, x_max):
         for y, colour, line_style, label in self._h_lines_params:
             if isinstance(y, Var):
                 y_val, y_err = y.val_err()
@@ -226,15 +228,28 @@ class Figure:
 def mnk(x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence], figure: Optional[Figure] = None,
         colour: Optional[str] = None,
         line_style: Optional[str] = None, label: Optional[str] = None) -> Tuple[Var, Var]:
-    # Данный метод считает два вида ошибок: вызываемый погрешностями и вызываемый статистикой.
-    # Если точки хорошо ложатся на прямую, то преобладать будет ошибка из-за погрешностей.
-    # Если точки измерены крайне точно, но на прямую они ложатся так себе, то преобладает статистическая ошибка.
-    # Рещультирующей ошибкой выдаётся корень из суммы квадратов двух видов этих ошибок
+    """
+    This method counts two types of errors: those caused by errors and those caused by statistics.
+    If the points lie well on the line, then the error due to errors will prevail.
+    If the points are measured extremely accurately, but they lie badly on a straight line,
+    then the statistical error prevails.
+    The resulting error is the root sum of the squares of the two types of these errors.
+
+    :param x: the sequence of points on x-axis
+    :param y: the sequence of points on y-axis
+    :param figure: the spot where the fpath will display
+    :param colour: colour of the line
+    :param line_style: style of the line
+    :param label: the inscription that will reflect in the legend
+
+    :return: coefficients of the straight
+    """
     # TODO: учитывать точки с весом обратным квадрату ошибки
-    if len(x) != len(y): raise TypeError('"x" and "y" must be the same length')
-    if len(x) == 0: raise ValueError('What should I do with no dots? Genius blyat!')
-    if len(x) == 1: raise ValueError('One dot!?!? Are you serious, Sam?')
-    if len(x) == 2: raise ValueError('There is no need in mnk if you have only 2 dots')
+    if len(x) != len(y):
+        raise TypeError('"x" and "y" must be the same length')
+    if len(x) == 0 or len(x) == 1 or len(x) == 2:
+        raise ValueError('The number of points must be at least 3')
+
     if not isinstance(x, GroupVar):
         x = GroupVar(x, 0)
     if not isinstance(y, GroupVar):
@@ -255,6 +270,18 @@ def mnk(x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence], figure: Opti
 
 def mnk_through0(x: GroupVar, y: GroupVar, figure: Optional[Figure] = None, colour: Optional[str] = None,
                  line_style: Optional[str] = None, label: Optional[str] = None) -> Var:
+    """
+    This method builds mnk through the point (0, 0)
+
+    :param x: the sequence of points on x-axis
+    :param y: the sequence of points on y-axis
+    :param figure: the spot where the fpath will display
+    :param colour: colour of the line
+    :param line_style: style of the line
+    :param label: the inscription that will reflect in the legend
+
+    :return: coefficient of the straight
+    """
     # todo: добавить статистическую ошибку
     if len(x) != len(y):
         raise TypeError('"x" and "y" must be the same length')
@@ -266,6 +293,16 @@ def mnk_through0(x: GroupVar, y: GroupVar, figure: Optional[Figure] = None, colo
 
 
 def _find_stat_errors(x: array, y: array, k, b):
+    """
+    This method calculates statistical error of the graph
+
+    :param x: the sequence of points on x-axis
+    :param y: the sequence of points on y-axis
+    :param k: the coefficient of inclination of the straight
+    :param b: the second coefficient
+
+    :return: statistical error of two coefficients
+    """
     Sy = sum((y - b - k * x) ** 2) / (len(x) - 2)
     D = len(x) * sum(x ** 2) - (sum(x)) ** 2
     # returns dk, db

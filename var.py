@@ -33,6 +33,7 @@ class Var:
     def __init__(self, value: SupportsFloat, error: SupportsFloat, exp: int = 0):
         """
         Generates object of Var class.
+
         :param value: the approximate value of directly measured variable
         :param error: it's standard deviation
         :param exp: if exp!=0 then value and error will be changed:
@@ -98,14 +99,14 @@ class Var:
         """
         return f'~{self.val()}'
 
-    def __str__(self) -> str:
+    def __str__(self, digital: bool = False) -> str:
         """
-        :return: string looking like "value \\pm error", where value end error are rounded.
-        Digits that have the same order as the 30% error will not be shown.
-        If error is zero, there won't be shown digits having the same order as 5% value.
-        (30% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
+        :param digital: do you want to use digital_normalize?
+        :return: suitable_normalize or digital_normalize
         """
-        return normalize(self)
+        if digital:
+            return digital_normalize(self)
+        return suitable_normalize(self)
 
     def __le__(self, other: Union[SupportsFloat, Var]) -> bool:
         """
@@ -179,6 +180,7 @@ class GroupVar:
     def __init__(self, variables: Sequence[Var], exp=0):
         """
         Generates GroupVar where 'variables' will be in 'self.variables'
+
         :param variables: something containing Vars
         :param exp: if exp!=0 then all variables will be changed:
             var -> var * 10 ** exp
@@ -189,6 +191,7 @@ class GroupVar:
     def __init__(self, values: Sequence[SupportsFloat], errors: Sequence[SupportsFloat], exp=0):
         """
         Generates lots of 'Var(value, error)' and puts them to 'self.variables'
+
         :param values: something containing numbers
         :param errors: something containing numbers
         :param exp: exp: if exp!=0 then all variables will be changed:
@@ -324,20 +327,75 @@ def set_value_accuracy(accuracy: float):
 
 def suitable_accuracy(val: float, err: float) -> int:
     """
-    Finds needed number of digits as it was shown Var.__str__ documentation
+    Finds needed number of digits.
+    Digits that have the same order as the 30% error will not be shown.
+    If error is zero, there won't be shown digits having the same order as 5% value.
+    (30% and 5% may be changed in 'set_error_accuracy' and 'value_accuracy' respectively.)
+
+    :return: amount of digits after the decimal point
     """
     if err == 0:
         return Decimal.from_float(val * value_accuracy).adjusted()
     return Decimal.from_float(err * error_accuracy).adjusted()
 
 
-def normalize(var: Var, accuracy: Optional[int] = None) -> str:
+def digital_accuracy(val: float, err: float) -> int:
     """
-    The same as str(var), but you can set the number of shown digits in parameter 'accuracy'
+    Finds needed number of digits.
+    If the first significant (different from zero) digit is 1 or 2, the method rounds values and errors up to
+    the next digit. Else the method rounds values and errors up to the first significant digit.
+
+    :return: amount of digits after the decimal point
+    """
+    if err == 0:
+        return Decimal.from_float(val * value_accuracy).adjusted()
+    str_err = str(err)
+    # k - the number of the first significant digit, s - the number of decimal point in string
+    k, s = 0, 0
+    for i, digit in enumerate(str_err):
+        if digit == '.':
+            s = i
+    for i, digit in enumerate(str_err):
+        if digit != '0' and digit != '.':
+            if digit == '1' or digit == '2':
+                k = i + 1
+            else:
+                k = i
+            break
+    if s - k >= 0:
+        return s - k - 1
+    else:
+        return s - k
+
+
+def suitable_normalize(var: Var, accuracy: Optional[int] = None) -> str:
+    """
+    This method uses suitable_accuracy
+
+    :param var: a variable
+    :param accuracy: number of shown digits
+
+    :return: string looking like "value \\pm error", where value end error are rounded.
     """
     val, err = var.val_err()
     if accuracy is None:
         accuracy = suitable_accuracy(val, err)
+    return r'{0} \pm {1}'.format(
+        *({True: float, False: int}[accuracy < 0](round(num, -accuracy)) for num in (val, err)))
+
+
+def digital_normalize(var: Var, accuracy: Optional[int] = None) -> str:
+    """
+    This method uses digital_accuracy
+
+    :param var: a variable
+    :param accuracy: number of shown digits
+
+    :return: string looking like "value \\pm error", where value end error are rounded.
+    """
+    val, err = var.val_err()
+    if accuracy is None:
+        accuracy = digital_accuracy(val, err)
     return r'{0} \pm {1}'.format(
         *({True: float, False: int}[accuracy < 0](round(num, -accuracy)) for num in (val, err)))
 
@@ -355,10 +413,12 @@ def set_big_number(n: int):
 
 def estimated_error(func: Callable[[...], float], values: array, err_vector: array, val: float):
     """
+    This method calculates error of an indirect measurement.
     We catch warnings turning them to errors. If errors is too big, method returns RunTimeWarning exception.
+
     :param func: some function that is applied to values
-    :param values: some values
-    :param err_vector: errors that are checked for the size
+    :param values: values of variables that enter the function
+    :param err_vector: errors of a direct measurement
     :param val: a value
     """
     err_vector /= BIG_NUMBER
