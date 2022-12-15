@@ -54,6 +54,17 @@ class Figure:
 
     def line(self, k: Union[float, int, Var], b: Union[float, int, Var], colour: Optional[str] = None,
              line_style: Optional[str] = None, label: Optional[str] = None) -> Figure:
+        """
+        Draws a straight
+
+        :param k: coefficient of inclination of the line
+        :param b: the second coefficient of the line
+        :param colour: colour of the line
+        :param line_style: style of the line
+        :param label: the inscription that will reflect in the legend
+
+        :return: straight
+        """
         if isinstance(k, Var):
             k = k.val()
         if isinstance(b, Var):
@@ -63,11 +74,31 @@ class Figure:
 
     def v_line(self, x: Union[float, int, Var], colour: Optional[str] = None, line_style: Optional[str] = None,
                label: Optional[str] = None) -> Figure:
+        """
+        Draws a vertical straight
+
+        :param x: array of points
+        :param colour: colour of the line
+        :param line_style: style of the line
+        :param label: the inscription that will reflect in the legend
+
+        :return: vertical straight
+        """
         self._v_lines_params.append((x, colour, line_style, label))
         return self
 
     def h_line(self, y: Union[float, int, Var], colour: Optional[str] = None, line_style: Optional[str] = None,
                label: Optional[str] = None) -> Figure:
+        """
+        Draws a horizontal straight
+
+        :param y: array of points
+        :param colour: colour of the line
+        :param line_style: style of the line
+        :param label: the inscription that will reflect in the legend
+
+        :return: horizontal straight
+        """
         self._h_lines_params.append((y, colour, line_style, label))
         return self
 
@@ -75,16 +106,18 @@ class Figure:
                    N: int = 1000, line_style: Optional[str] = None, colour: Optional[str] = None,
                    label: Optional[str] = None, add_before_fixing_axes: bool = True) -> Figure:
         """
+        Draws the graph of the function
+
         :param func: the function we want to graph
         :param x_min: the minimum of x
         :param x_max: the maximum of x
         :param N: amount of dots on the graph
         :param line_style: style of line
         :param colour: colour of line
-        :param label: display in the legend
+        :param label: the inscription that will reflect in the legend
         :param add_before_fixing_axes: a value
 
-        :return: figure
+        :return: the graph of the function
         """
         # todo: doc and ;сделать возможность проводить линию до края графика по оси xt влево или вправо, если указано None;
         if isinstance(x_min, Var):
@@ -99,6 +132,19 @@ class Figure:
 
     def plot(self, x: Union[GroupVar, Sequence], y: Union[GroupVar, Sequence],
              capsize=3, s=1, colour=None, marker=None, label=None) -> Figure:
+        """
+        Draws the graph of dots with errors
+
+        :param x: array of dots on x-axis
+        :param y: array of dots on y-axis
+        :param capsize: a size for error bar
+        :param s: square of the dots
+        :param colour: colour of the line
+        :param marker: display of dots on the graph
+        :param label: the inscription that will reflect in the legend
+
+        :return: the graph
+        """
         def val_err(t):
             if isinstance(t, GroupVar):
                 return t.val_err()

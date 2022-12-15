@@ -77,6 +77,14 @@ def slicer(var: GroupVar, left_val: Optional[SupportsFloat] = None,
 
 
 def prototype(XL: str, zero_in_corner=True) -> None:
+    """
+    Draws the graph of data from excel-file
+
+    :param XL: data from excel-file
+    :param zero_in_corner: check if the corner of the table is empty
+
+    :return: None
+    """
     x_val, y_val = to_table(XL)
     x, y = GroupVar(x_val, 0), GroupVar(y_val, 0)
     Figure(zero_in_corner=zero_in_corner).plot(x, y).show()
@@ -107,6 +115,15 @@ def sorting(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar]) ->
 
 
 def smoothing(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar], smooth_factor) -> Callable:
+    """
+    Smoothing of the function
+
+    :param x: an array on x-axis
+    :param y: an array on y-axis
+    :param smooth_factor: smooth_factor in _UnivariateSpline
+
+    :return: smoothing function
+    """
     # todo: сделать покопаться в _UnivariateSpline и учитывать каждую точку с весом ошибки
     x, y = sorting(x, y)
     if isinstance(x, GroupVar):
@@ -156,11 +173,30 @@ def fmin(f: Callable, x0: Union[Var, SupportsFloat], x: Optional[GroupVar] = Non
 
 def fmax(f: Callable, x0: Union[Var, SupportsFloat], x: Optional[GroupVar] = None, y: Optional[GroupVar] = None) \
         -> Union[Var, SupportsFloat]:
+    """
+    fmax is for very accurate search of maximum of known graph
+
+    :param f: function to maximize
+    :param x0: dot near maximum
+    :param x: to find the error accurately
+    :param y: to find the error accurately
+
+    :return: x_max
+    """
     return fmin(lambda t: -f(t), x0, x=x, y=y)
 
 
 def curve_fit(f: Callable, x: GroupVar, y: GroupVar, p0: Optional[Sequence[SupportsFloat]] = None):
-    """unfortunately, ignores x.err()"""
+    """
+    Makes curve function approximation. Unfortunately, ignores x.err()
+
+    :param f: the function we want to approximate
+    :param x: an array on x-axis
+    :param y: an array on y-axis
+    :param p0: parameter to curve_fit
+
+    :return: coefficients of approximated curve
+    """
     initial_p = None if p0 is None else np.array(p0)
     too_small_err = np.any(np.asarray(y.err()) < 1/np.finfo(np.float_).max)
     sigma = None if too_small_err else y.err()
