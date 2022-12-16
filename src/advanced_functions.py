@@ -9,7 +9,7 @@ from scipy.interpolate import UnivariateSpline as _UnivariateSpline
 from scipy.optimize import fmin as _fmin
 from scipy.optimize import curve_fit as _curve_fit
 
-from lab_cheat import *
+from . import *
 from .table import rus_tex_formula
 from .var import set_value_accuracy, set_error_accuracy, set_big_number, digital_normalize_tuple, GroupVar
 
