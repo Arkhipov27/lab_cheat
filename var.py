@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from functools import total_ordering
+from functools import total_ordering, wraps
 from typing import Sequence, SupportsFloat, Dict, List, Union, overload, Callable, Optional, Tuple, Iterable
 from warnings import catch_warnings, simplefilter
 
@@ -105,7 +105,7 @@ class Var:
         :return: suitable_normalize or digital_normalize
         """
         if digital:
-            return digital_normalize(self)
+            return digital_normalize_str(self)
         return suitable_normalize(self)
 
     def __le__(self, other: Union[SupportsFloat, Var]) -> bool:
@@ -356,8 +356,8 @@ def digital_accuracy(val: float, err: float) -> int:
         if digit == '.':
             s = i
     for i, digit in enumerate(str_err):
-        if digit != '0' and digit != '.':
-            if digit == '1' or digit == '2':
+        if digit not in ['0', '.']:
+            if digit in ['1', '2']:
                 k = i + 1
             else:
                 k = i
@@ -386,103 +386,69 @@ def suitable_normalize(var: Var, accuracy: Optional[int] = None) -> str:
         *({True: float, False: int}[accuracy < 0](round(num, -accuracy)) for num in (val, err)))
 
 
-def digital_normalize(var: Var, accuracy: Optional[int] = None) -> str:
+def _digital_normalize(func):
+    @wraps(func)
+    def _normalize(var: Var, accuracy: Optional[int] = None):
+        val, err = var.val_err()
+        if accuracy is None:
+            accuracy = digital_accuracy(val, err)
+        str_val = r'{}'.format({True: float, False: int}[accuracy < 0](round(val, -accuracy)))
+        str_err = r'{}'.format({True: float, False: int}[accuracy < 0](round(err, -accuracy)))
+        val = round(val, -accuracy)
+        err = round(err, -accuracy)
+
+        def amount_of_digits(value: str):
+            k, s = 0, 0
+            for i, digit in enumerate(value):
+                if digit == '.':
+                    s = i
+                else:
+                    k = i
+            if s - k >= 0:
+                return s - k - 1
+            else:
+                return s - k
+
+        amount_of_digits_err = amount_of_digits(str(err))
+        amount_of_digits_val = amount_of_digits(str(val))
+        str_val += '0' * (amount_of_digits_val - accuracy)
+        str_err += '0' * (amount_of_digits_err - accuracy)
+
+        return func(str_val, str_err, accuracy)
+
+    return _normalize
+
+
+@_digital_normalize
+def digital_normalize_str(str_val, str_err, accuracy) -> str:
     """
     This method uses digital_accuracy
 
-    :param var: a variable
-    :param accuracy: number of shown digits
+    :param str_val: a value in string format
+    :param str_err: an error in string format
+    :param accuracy: None
 
     :return: string looking like "value \\pm error", where value end error are rounded.
     """
-    val, err = var.val_err()
-    if accuracy is None:
-        accuracy = digital_accuracy(val, err)
-    string1 = r'{}'.format({True: float, False: int}[accuracy < 0](round(val, -accuracy)))
-    string2 = r'{}'.format({True: float, False: int}[accuracy < 0](round(err, -accuracy)))
-    val = round(val, -accuracy)
-    err = round(err, -accuracy)
 
-    k, s = 0, 0
-    for i, digit in enumerate(str(err)):
-        if digit == '.':
-            s = i
-        else:
-            k = i
-    if s - k >= 0:
-        amount_of_digits_err = s - k - 1
-    else:
-        amount_of_digits_err = s - k
-
-    k1, s1 = 0, 0
-    for i, digit in enumerate(str(val)):
-        if digit == '.':
-            s1 = i
-        else:
-            k1 = i
-    if s1 - k1 >= 0:
-        amount_of_digits_val = s1 - k1 - 1
-    else:
-        amount_of_digits_val = s1 - k1
-
-    n = amount_of_digits_val - accuracy
-    m = amount_of_digits_err - accuracy
-    for i in range(n):
-        string1 += '0'
-    for i in range(m):
-        string2 += '0'
-    return r'{0} \pm {1}'.format(string1, string2)
+    return r'{0} \pm {1}'.format(str_val, str_err)
 
 
-def digital_normalize_tuple(var: Var, accuracy: Optional[int] = None) -> tuple:
+@_digital_normalize
+def digital_normalize_tuple(str_val, str_err, accuracy) -> tuple:
     """
-    The same as digital_normalize but returns tuple of value and error
+    The same as digital_normalize_str but returns tuple of value and error
 
-    :param var: a variable
-    :param accuracy: number of shown digits
+    :param str_val: a value in string format
+    :param str_err: an error in string format
+    :param accuracy: None
 
     :return: tuple containing from value and error of the variable
     """
-    val, err = var.val_err()
-    if accuracy is None:
-        accuracy = digital_accuracy(val, err)
-    string1 = r'{}'.format({True: float, False: int}[accuracy < 0](round(val, -accuracy)))
-    string2 = r'{}'.format({True: float, False: int}[accuracy < 0](round(err, -accuracy)))
-    val = round(val, -accuracy)
-    err = round(err, -accuracy)
-
-    k, s = 0, 0
-    for i, digit in enumerate(str(err)):
-        if digit == '.':
-            s = i
-        else:
-            k = i
-    if s - k >= 0:
-        amount_of_digits_err = s - k - 1
-    else:
-        amount_of_digits_err = s - k
-
-    k1, s1 = 0, 0
-    for i, digit in enumerate(str(val)):
-        if digit == '.':
-            s1 = i
-        else:
-            k1 = i
-    if s1 - k1 >= 0:
-        amount_of_digits_val = s1 - k1 - 1
-    else:
-        amount_of_digits_val = s1 - k1
-
-    n = amount_of_digits_val - accuracy
-    m = amount_of_digits_err - accuracy
-    for i in range(n):
-        string1 += '0'
-    for i in range(m):
-        string2 += '0'
     if accuracy < 0:
-        return float(string1), float(string2)
+        return float(str_val), float(str_err)
     else:
-        return int(string1), int(string2)
+        return int(str_val), int(str_err)
 
 
 BIG_NUMBER = 50
