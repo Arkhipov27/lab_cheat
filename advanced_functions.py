@@ -11,9 +11,9 @@ from scipy.optimize import curve_fit as _curve_fit
 
 from lab_cheat import *
 from .table import rus_tex_formula
-from .var import set_value_accuracy, set_error_accuracy, set_big_number, digital_normalize, GroupVar
+from .var import set_value_accuracy, set_error_accuracy, set_big_number, digital_normalize_tuple, GroupVar
 
-_rare_used_funcs = [set_value_accuracy, set_error_accuracy, set_big_number, rus_tex_formula, digital_normalize]
+_rare_used_funcs = [set_value_accuracy, set_error_accuracy, set_big_number, rus_tex_formula, digital_normalize_tuple]
 
 
 def slicer(var: GroupVar, left_val: Optional[SupportsFloat] = None,
@@ -205,6 +205,13 @@ def curve_fit(f: Callable, x: GroupVar, y: GroupVar, p0: Optional[Sequence[Suppo
 
 
 def sigma(variable: Union[GroupVar, Sequence]):
+    """
+    Calculates standard deviation of values in variable
+
+    :param variable: a variable
+
+    :return: sqrt from the variance
+    """
     if isinstance(variable, GroupVar):
         variable = variable.val()
     return sqrt(_var(variable))
