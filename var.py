@@ -441,7 +441,7 @@ def digital_normalize_tuple(str_val, str_err, accuracy) -> tuple:
 
     :param str_val: a value in string format
     :param str_err: an error in string format
-    :param accuracy: None
+    :param accuracy: accuracy
 
     :return: tuple containing from value and error of the variable
     """
