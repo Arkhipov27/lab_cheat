@@ -90,8 +90,8 @@ def prototype(XL: str, zero_in_corner=True) -> None:
     Figure(zero_in_corner=zero_in_corner).plot(x, y).show()
 
 
-def sorting(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar]) -> Tuple[
-    Union[array, List, GroupVar], Union[array, List, GroupVar]]:
+def sorting(x: Union[List, GroupVar], y: Union[List, GroupVar]) -> Tuple[
+    Union[List, GroupVar], Union[List, GroupVar]]:
     """
     !!! x and y must be the same type !!!
     Sorts pairs of data to make xt raising
@@ -114,7 +114,7 @@ def sorting(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar]) ->
             raise TypeError('x and y must be the same type')
 
 
-def smoothing(x: Union[array, List, GroupVar], y: Union[array, List, GroupVar], smooth_factor) -> Callable:
+def smoothing(x: Union[List, GroupVar], y: Union[List, GroupVar], smooth_factor) -> Callable:
     """
     Smoothing of the function
 
