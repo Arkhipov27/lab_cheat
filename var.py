@@ -424,8 +424,8 @@ def digital_normalize_str(str_val, str_err, accuracy) -> str:
     """
     This method uses digital_accuracy
 
-    :param str_val: a value in Var format
-    :param str_err: an error in Var format
+    :param str_val: a value in string format
+    :param str_err: an error in string format
     :param accuracy: None
 
     :return: string looking like "value \\pm error", where value end error are rounded.
@@ -439,9 +439,9 @@ def digital_normalize_tuple(str_val, str_err, accuracy) -> tuple:
     """
     The same as digital_normalize_str but returns tuple of value and error
 
-    :param str_val: a value in Var format
-    :param str_err: an error in Var format
-    :param accuracy: amount of digits after the decimal point
+    :param str_val: a value in string format
+    :param str_err: an error in string format
+    :param accuracy: None
 
     :return: tuple containing from value and error of the variable
     """
