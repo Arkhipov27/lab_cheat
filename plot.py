@@ -7,7 +7,7 @@ import matplotlib.patches as _mp
 import matplotlib.pyplot as plt
 from numpy import array, linspace, sqrt
 
-from .var import Var, GroupVar
+from lab_cheat.var import Var, GroupVar
 
 
 class Figure:

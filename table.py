@@ -2,7 +2,7 @@ import tkinter as tk
 from string import printable as english_symbols
 from typing import List, Tuple
 
-from .var import Var, GroupVar, digital_normalize_tuple
+from lab_cheat.var import Var, GroupVar, digital_normalize_tuple
 
 
 def rus_tex_formula(formula: str) -> str:

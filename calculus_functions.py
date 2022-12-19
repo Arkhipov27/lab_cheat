@@ -1,6 +1,6 @@
 from functools import reduce
 from operator import add
-from .var import Var, GroupVar
+from lab_cheat.var import Var, GroupVar
 import sympy as sp
 import numpy as np
 
